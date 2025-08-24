@@ -36,7 +36,7 @@ npm start &
 echo ""
 echo "🎉 Development environment is starting!"
 echo ""
-echo "📱 Frontend: http://localhost:3000"
+echo "📱 Frontend: http://localhost:1010"
 echo "🔧 Backend:  http://localhost:1009"
 echo "📚 API Docs: http://localhost:1009/openapi.json"
 echo ""
