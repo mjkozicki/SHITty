@@ -1,0 +1,32 @@
+server:
+  port: 8080
+  host: "0.0.0.0"
+  mode: "debug" # debug, release
+
+database:
+  type: "memory" # memory, postgres, mysql, mongodb
+  host: "localhost"
+  port: 5432
+  name: "shitty_db"
+  user: "shitty_user"
+  password: "shitty_password"
+
+features:
+  enable_search_history: true
+  enable_recommendations: true
+  enable_cart_persistence: true
+  max_cart_items: 100
+  max_search_history: 50
+
+logging:
+  level: "info" # debug, info, warn, error
+  format: "json" # json, text
+  output: "stdout" # stdout, file
+
+swagger:
+  enabled: true
+  title: "SHITty E-commerce API"
+  description: "A comprehensive e-commerce API with product management, shopping cart, orders, and recommendations"
+  version: "1.0.0"
+  host: "localhost:8080"
+  base_path: "/api/v1"
