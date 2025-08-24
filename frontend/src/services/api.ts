@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:1009/api/v1';
+const API_BASE_URL = 'http://localhost:3001/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -77,7 +77,7 @@ export const apiService = {
   },
 
   removeFromCart: async (userId: string, item: CartItem): Promise<Cart> => {
-    const response = await api.delete(`/cart/remove?user_id=${userId}`, item);
+    const response = await api.delete(`/cart/remove?user_id=${userId}`, { data: item });
     return response.data;
   },
 

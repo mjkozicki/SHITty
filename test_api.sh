@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # SHITty E-commerce API Test Script
-# Make sure the server is running on localhost:8080 before executing this script
+# Make sure the server is running on localhost:3001 before executing this script
 
-BASE_URL="http://localhost:8080/api/v1"
+BASE_URL="http://localhost:3001/api/v1"
 USER_ID="test_user_123"
 
 echo "🧪 Testing SHITty E-commerce API"
@@ -92,5 +92,5 @@ echo ""
 
 echo "✅ API testing completed!"
 echo ""
-echo "📚 API Documentation available at: http://localhost:1009/swagger/index.html"
-echo "🔗 OpenAPI JSON available at: http://localhost:1009/openapi.json"
+echo "📚 API Documentation available at: http://localhost:3001/swagger/index.html"
+echo "🔗 OpenAPI JSON available at: http://localhost:3001/openapi.json"

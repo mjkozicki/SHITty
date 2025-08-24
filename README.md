@@ -59,7 +59,7 @@ go mod tidy
 go run main.go
 ```
 
-The server will start on `http://localhost:1009`
+The server will start on `http://localhost:3001`
 
 ### Alternative: Using Docker
 
@@ -96,43 +96,43 @@ npm start
 npm run build
 ```
 
-The frontend will be available at `http://localhost:1010` and will automatically connect to the Go backend at `http://localhost:1009`.
+The frontend will be available at `http://localhost:3002` and will automatically connect to the Go backend at `http://localhost:3001`.
 
 ### API Documentation
 
 
 Once the server is running, you can access the API documentation at:
-- **OpenAPI Specification**: `http://localhost:1009/openapi.json`
-- **Health Check**: `http://localhost:1009/health`
+- **OpenAPI Specification**: `http://localhost:3001/openapi.json`
+- **Health Check**: `http://localhost:3001/health`
 
 
 ## Usage Examples
 
 ### Get All Products
 ```bash
-curl http://localhost:1009/api/v1/products
+curl http://localhost:3001/api/v1/products
 ```
 
 ### Add Product to Cart
 ```bash
-curl -X POST http://localhost:1009/api/v1/cart/add?user_id=user123 \
+curl -X POST http://localhost:3001/api/v1/cart/add?user_id=user123 \
   -H "Content-Type: application/json" \
   -d '{"product_id": "1", "quantity": 2}'
 ```
 
 ### Search Products
 ```bash
-curl "http://localhost:1009/api/v1/search?q=iPhone&user_id=user123"
+curl "http://localhost:3001/api/v1/search?q=iPhone&user_id=user123"
 ```
 
 ### Get Recommendations
 ```bash
-curl http://localhost:1009/api/v1/recommendations/user123
+curl http://localhost:3001/api/v1/recommendations/user123
 ```
 
 ### Checkout
 ```bash
-curl -X POST http://localhost:1009/api/v1/checkout?user_id=user123
+curl -X POST http://localhost:3001/api/v1/checkout?user_id=user123
 ```
 
 ## Data Models

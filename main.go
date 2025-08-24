@@ -67,7 +67,7 @@ var (
 // @title SHITty E-commerce API
 // @version 1.0
 // @description A comprehensive e-commerce API with product management, shopping cart, orders, and recommendations
-// @host localhost:1009
+// @host localhost:3001
 // @BasePath /api/v1
 func main() {
 	// Initialize sample data
@@ -630,8 +630,8 @@ func main() {
 	// Swagger documentation (temporarily disabled for Docker build)
 	// r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	log.Println("Server starting on :1009")
-	log.Fatal(r.Run(":1009"))
+	log.Println("Server starting on :3001")
+	log.Fatal(r.Run(":3001"))
 }
 
 // initializeData populates the system with sample data

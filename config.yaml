@@ -1,5 +1,5 @@
 server:
-  port: 1009
+  port: 3001
   host: "0.0.0.0"
   mode: "debug" # debug, release
 
@@ -28,5 +28,5 @@ swagger:
   title: "SHITty E-commerce API"
   description: "A comprehensive e-commerce API with product management, shopping cart, orders, and recommendations"
   version: "1.0.0"
-      host: "localhost:1009"
+      host: "localhost:3001"
   base_path: "/api/v1"

@@ -14,15 +14,15 @@ fi
 
 # Start the backend
 echo "🐳 Starting Go backend in Docker..."
-docker run --rm -d -p 1009:1009 --name shitty-backend shitty-api
+docker run --rm -d -p 3001:3001 --name shitty-backend shitty-api
 
 # Wait for backend to be ready
 echo "⏳ Waiting for backend to be ready..."
 sleep 5
 
 # Check if backend is responding
-if curl -s http://localhost:1009/health > /dev/null; then
-    echo "✅ Backend is running at http://localhost:1009"
+if curl -s http://localhost:3001/health > /dev/null; then
+    echo "✅ Backend is running at http://localhost:3001"
 else
     echo "❌ Backend failed to start. Check Docker logs."
     exit 1
@@ -36,9 +36,9 @@ npm start &
 echo ""
 echo "🎉 Development environment is starting!"
 echo ""
-echo "📱 Frontend: http://localhost:1010"
-echo "🔧 Backend:  http://localhost:1009"
-echo "📚 API Docs: http://localhost:1009/openapi.json"
+echo "📱 Frontend: http://localhost:3002"
+echo "🔧 Backend:  http://localhost:3001"
+echo "📚 API Docs: http://localhost:3001/openapi.json"
 echo ""
 echo "Press Ctrl+C to stop both services"
 echo ""
