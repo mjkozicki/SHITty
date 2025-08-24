@@ -1,160 +1,213 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MagnifyingGlassIcon, StarIcon } from '@heroicons/react/24/solid';
+import { MagnifyingGlassIcon, StarIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
 import { apiService, Product } from '../services/api';
 
 const Home: React.FC = () => {
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Product[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadFeaturedProducts = async () => {
       try {
-        const products = await apiService.getTopProducts(4);
+        const products = await apiService.getTopProducts(6);
         setFeaturedProducts(products);
       } catch (error) {
-        console.error('Error loading featured products:', error);
+        console.error('Failed to load featured products:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     loadFeaturedProducts();
   }, []);
 
-  const handleSearch = async (e: React.FormEvent) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchQuery.trim()) return;
-
-    setIsSearching(true);
-    try {
-      const results = await apiService.searchProducts(searchQuery, 'user123');
-      setSearchResults(results);
-    } catch (error) {
-      console.error('Error searching products:', error);
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
+    if (searchQuery.trim()) {
+      // Navigate to products page with search query
+      window.location.href = `/products?search=${encodeURIComponent(searchQuery.trim())}`;
     }
   };
 
-  const ProductCard: React.FC<{ product: Product }> = ({ product }) => (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="aspect-w-1 aspect-h-1 w-full">
-        <img
-          src={product.image_url}
-          alt={product.name}
-          className="w-full h-48 object-cover"
-          onError={(e) => {
-            e.currentTarget.src = 'https://via.placeholder.com/300x200?text=Product+Image';
-          }}
-        />
-      </div>
-      <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">{product.name}</h3>
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center">
-            <StarIcon className="w-4 h-4 text-yellow-400 mr-1" />
-            <span className="text-sm text-gray-600">{product.rating}</span>
-          </div>
-          <span className="text-sm text-gray-500">Stock: {product.stock}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xl font-bold text-primary-600">${product.price}</span>
-          <Link
-            to={`/products/${product.id}`}
-            className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors text-sm font-medium"
-          >
-            View Details
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
-    <div className="space-y-12">
+    <main id="main-content" className="min-h-screen">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-8 text-white text-center">
-        <h1 className="text-4xl md:text-6xl font-bold mb-4">
-          Welcome to SHITty
-        </h1>
-        <p className="text-xl md:text-2xl mb-8 text-primary-100">
-          Your one-stop shop for amazing products
-        </p>
-        
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search for products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-6 py-4 text-gray-800 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
-            />
-            <button
-              type="submit"
-              disabled={isSearching}
-              className="absolute right-2 top-2 bg-primary-600 text-white p-2 rounded-md hover:bg-primary-700 transition-colors disabled:opacity-50"
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-primary-100 py-20">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-500/10 to-secondary-500/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Welcome to{' '}
+            <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+              SHITty
+            </span>
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+            Discover amazing products with our intelligent recommendations and seamless shopping experience.
+          </p>
+          
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-12">
+            <div className="relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search for products..."
+                className="w-full px-6 py-4 text-lg border-0 rounded-2xl shadow-xl focus:ring-4 focus:ring-primary-300 focus:outline-none transition-all duration-300"
+                aria-label="Search for products"
+              />
+              <button
+                type="submit"
+                className="absolute right-2 top-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white p-3 rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+                aria-label="Search products"
+              >
+                <MagnifyingGlassIcon className="w-6 h-6" />
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      {/* Featured Products Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Featured Products
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Handpicked products that our customers love. Discover quality items at great prices.
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-gray-200 rounded-2xl h-64 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
+
+          <div className="text-center mt-12">
+            <Link
+              to="/products"
+              className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-2xl hover:from-primary-600 hover:to-primary-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             >
-              <MagnifyingGlassIcon className="w-6 h-6" />
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* Search Results */}
-      {searchResults.length > 0 && (
-        <div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">
-            Search Results for "{searchQuery}"
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {searchResults.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+              View All Products
+              <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
           </div>
         </div>
-      )}
+      </section>
 
-      {/* Featured Products */}
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">Featured Products</h2>
-          <Link
-            to="/products"
-            className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
-          >
-            View All Products →
-          </Link>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </div>
+      {/* Features Section */}
+      <section className="py-16 bg-gradient-to-br from-gray-50 to-primary-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Why Choose SHITty?
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              We're committed to providing the best shopping experience with smart features and excellent service.
+            </p>
+          </div>
 
-      {/* Call to Action */}
-      <div className="bg-gray-100 rounded-2xl p-8 text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          Ready to start shopping?
-        </h2>
-        <p className="text-gray-600 mb-6">
-          Explore our wide selection of products and find exactly what you're looking for.
-        </p>
-        <Link
-          to="/products"
-          className="bg-primary-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-primary-700 transition-colors inline-block"
-        >
-          Browse Products
-        </Link>
-      </div>
-    </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <FeatureCard
+              icon="🎯"
+              title="Smart Recommendations"
+              description="Get personalized product suggestions based on your preferences and purchase history."
+            />
+            <FeatureCard
+              icon="🚀"
+              title="Fast Delivery"
+              description="Quick and reliable shipping to get your products to you as soon as possible."
+            />
+            <FeatureCard
+              icon="💎"
+              title="Quality Guaranteed"
+              description="We only offer products that meet our high standards for quality and value."
+            />
+          </div>
+        </div>
+      </section>
+    </main>
   );
 };
+
+// Product Card Component
+interface ProductCardProps {
+  product: Product;
+}
+
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => (
+  <div className="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
+    <div className="relative overflow-hidden">
+      <img
+        src={product.image_url}
+        alt={product.name}
+        className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+        loading="lazy"
+      />
+      <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-gray-800">
+        ${product.price.toFixed(2)}
+      </div>
+    </div>
+    
+    <div className="p-6">
+      <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors duration-200">
+        {product.name}
+      </h3>
+      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+        {product.description}
+      </p>
+      
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-1">
+          <StarIcon className="w-5 h-5 text-yellow-400 fill-current" />
+          <span className="text-sm font-medium text-gray-700">{product.rating}</span>
+        </div>
+        <span className="text-sm text-gray-500">Stock: {product.stock}</span>
+      </div>
+      
+      <Link
+        to={`/products/${product.id}`}
+        className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold py-3 px-4 rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-300 flex items-center justify-center space-x-2 group-hover:shadow-lg"
+      >
+        <ShoppingCartIcon className="w-5 h-5" />
+        <span>View Details</span>
+      </Link>
+    </div>
+  </div>
+);
+
+// Feature Card Component
+interface FeatureCardProps {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) => (
+  <div className="text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+    <div className="text-4xl mb-4">{icon}</div>
+    <h3 className="text-xl font-semibold text-gray-900 mb-3">{title}</h3>
+    <p className="text-gray-600 leading-relaxed">{description}</p>
+  </div>
+);
 
 export default Home;

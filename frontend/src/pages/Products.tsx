@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { StarIcon, MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/solid';
+import { Link, useSearchParams } from 'react-router-dom';
+import { StarIcon, FunnelIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import { apiService, Product } from '../services/api';
-import { useCart } from '../contexts/CartContext';
 
 const Products: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<'name' | 'price' | 'rating'>('name');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  
-  const { addItem } = useCart();
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -22,7 +20,7 @@ const Products: React.FC = () => {
         setProducts(allProducts);
         setFilteredProducts(allProducts);
       } catch (error) {
-        console.error('Error loading products:', error);
+        console.error('Failed to load products:', error);
       } finally {
         setLoading(false);
       }
@@ -32,9 +30,9 @@ const Products: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    let filtered = products;
+    let filtered = [...products];
 
-    // Filter by search query
+    // Apply search filter
     if (searchQuery) {
       filtered = filtered.filter(product =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -43,32 +41,22 @@ const Products: React.FC = () => {
       );
     }
 
-    // Filter by category
+    // Apply category filter
     if (selectedCategory !== 'all') {
       filtered = filtered.filter(product => product.category === selectedCategory);
     }
 
-    // Sort products
+    // Apply sorting
     filtered.sort((a, b) => {
-      let aValue: string | number;
-      let bValue: string | number;
+      let aValue: any = a[sortBy as keyof Product];
+      let bValue: any = b[sortBy as keyof Product];
 
-      switch (sortBy) {
-        case 'name':
-          aValue = a.name.toLowerCase();
-          bValue = b.name.toLowerCase();
-          break;
-        case 'price':
-          aValue = a.price;
-          bValue = b.price;
-          break;
-        case 'rating':
-          aValue = a.rating;
-          bValue = b.rating;
-          break;
-        default:
-          aValue = a.name.toLowerCase();
-          bValue = b.name.toLowerCase();
+      if (sortBy === 'price' || sortBy === 'rating' || sortBy === 'stock') {
+        aValue = Number(aValue);
+        bValue = Number(bValue);
+      } else {
+        aValue = String(aValue).toLowerCase();
+        bValue = String(bValue).toLowerCase();
       }
 
       if (sortOrder === 'asc') {
@@ -81,137 +69,230 @@ const Products: React.FC = () => {
     setFilteredProducts(filtered);
   }, [products, searchQuery, selectedCategory, sortBy, sortOrder]);
 
-  const categories = ['all', ...Array.from(new Set(products.map(p => p.category)))];
-
-  const handleAddToCart = (product: Product) => {
-    addItem(product, 1);
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setSearchParams({ search: searchQuery.trim() });
+    } else {
+      setSearchParams({});
+    }
   };
+
+  const categories = ['all', ...Array.from(new Set(products.map(p => p.category)))];
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i}>
+                  <div className="bg-gray-200 rounded-2xl h-48 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-        <h1 className="text-3xl font-bold text-gray-800">All Products</h1>
-        <div className="flex items-center space-x-4">
-          <span className="text-gray-600">{filteredProducts.length} products</span>
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            Our Products
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Discover our carefully curated collection of high-quality products. 
+            Use filters and search to find exactly what you're looking for.
+          </p>
         </div>
-      </div>
 
-      {/* Filters and Search */}
-      <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search */}
-          <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-          </div>
-
-          {/* Category Filter */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          >
-            {categories.map(category => (
-              <option key={category} value={category}>
-                {category === 'all' ? 'All Categories' : category}
-              </option>
-            ))}
-          </select>
-
-          {/* Sort By */}
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as 'name' | 'price' | 'rating')}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          >
-            <option value="name">Sort by Name</option>
-            <option value="price">Sort by Price</option>
-            <option value="rating">Sort by Rating</option>
-          </select>
-
-          {/* Sort Order */}
-          <button
-            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent flex items-center justify-center space-x-2"
-          >
-            <FunnelIcon className="w-5 h-5" />
-            <span>{sortOrder === 'asc' ? '↑' : '↓'}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Products Grid */}
-      {filteredProducts.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">No products found matching your criteria.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="aspect-w-1 aspect-h-1 w-full">
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-full h-48 object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = 'https://via.placeholder.com/300x200?text=Product+Image';
-                  }}
+        {/* Search and Filters */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Search */}
+            <div className="lg:col-span-2">
+              <form onSubmit={handleSearch} className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-primary-300 focus:border-primary-500 focus:outline-none transition-all duration-200"
+                  aria-label="Search products"
                 />
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">{product.name}</h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center">
-                    <StarIcon className="w-4 h-4 text-yellow-400 mr-1" />
-                    <span className="text-sm text-gray-600">{product.rating}</span>
-                  </div>
-                  <span className="text-sm text-gray-500">Stock: {product.stock}</span>
-                </div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xl font-bold text-primary-600">${product.price}</span>
-                  <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                    {product.category}
-                  </span>
-                </div>
-                <div className="flex space-x-2">
-                  <Link
-                    to={`/products/${product.id}`}
-                    className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors text-sm font-medium text-center"
-                  >
-                    View Details
-                  </Link>
-                  <button
-                    onClick={() => handleAddToCart(product)}
-                    disabled={product.stock === 0}
-                    className="flex-1 bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-                  </button>
-                </div>
-              </div>
+                <button
+                  type="submit"
+                  className="absolute right-2 top-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white p-2 rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200"
+                  aria-label="Search"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </button>
+              </form>
             </div>
-          ))}
+
+            {/* Category Filter */}
+            <div>
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                Category
+              </label>
+              <select
+                id="category"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-primary-300 focus:border-primary-500 focus:outline-none transition-all duration-200"
+              >
+                {categories.map(category => (
+                  <option key={category} value={category}>
+                    {category === 'all' ? 'All Categories' : category}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Sort */}
+            <div>
+              <label htmlFor="sort" className="block text-sm font-medium text-gray-700 mb-2">
+                Sort By
+              </label>
+              <select
+                id="sort"
+                value={`${sortBy}-${sortOrder}`}
+                onChange={(e) => {
+                  const [field, order] = e.target.value.split('-');
+                  setSortBy(field);
+                  setSortOrder(order as 'asc' | 'desc');
+                }}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-primary-300 focus:border-primary-500 focus:outline-none transition-all duration-200"
+              >
+                <option value="name-asc">Name A-Z</option>
+                <option value="name-desc">Name Z-A</option>
+                <option value="price-asc">Price Low-High</option>
+                <option value="price-desc">Price High-Low</option>
+                <option value="rating-desc">Rating High-Low</option>
+                <option value="stock-asc">Stock Low-High</option>
+              </select>
+            </div>
+          </div>
         </div>
-      )}
+
+        {/* Results Count */}
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-gray-600">
+            Showing <span className="font-semibold">{filteredProducts.length}</span> of{' '}
+            <span className="font-semibold">{products.length}</span> products
+          </p>
+          {searchQuery && (
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setSearchParams({});
+              }}
+              className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
+            >
+              Clear search
+            </button>
+          )}
+        </div>
+
+        {/* Products Grid */}
+        {filteredProducts.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">🔍</div>
+            <h3 className="text-2xl font-semibold text-gray-900 mb-2">No products found</h3>
+            <p className="text-gray-600 mb-6">
+              Try adjusting your search terms or filters to find what you're looking for.
+            </p>
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedCategory('all');
+                setSearchParams({});
+              }}
+              className="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-200"
+            >
+              Clear all filters
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
+
+// Product Card Component
+interface ProductCardProps {
+  product: Product;
+}
+
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => (
+  <div className="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
+    <div className="relative overflow-hidden">
+      <img
+        src={product.image_url}
+        alt={product.name}
+        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+        loading="lazy"
+      />
+      <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-gray-800">
+        ${product.price.toFixed(2)}
+      </div>
+      {product.stock < 10 && (
+        <div className="absolute top-4 left-4 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+          Low Stock
+        </div>
+      )}
+    </div>
+    
+    <div className="p-6">
+      <div className="mb-2">
+        <span className="inline-block bg-primary-100 text-primary-800 text-xs px-2 py-1 rounded-full font-medium">
+          {product.category}
+        </span>
+      </div>
+      
+      <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors duration-200 line-clamp-2">
+        {product.name}
+      </h3>
+      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+        {product.description}
+      </p>
+      
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-1">
+          <StarIcon className="w-4 h-4 text-yellow-400 fill-current" />
+          <span className="text-sm font-medium text-gray-700">{product.rating}</span>
+        </div>
+        <span className="text-sm text-gray-500">Stock: {product.stock}</span>
+      </div>
+      
+      <div className="flex items-center justify-between">
+        <span className="text-2xl font-bold text-primary-600">${product.price.toFixed(2)}</span>
+        <Link
+          to={`/products/${product.id}`}
+          className="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2 rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-200 text-sm font-medium"
+        >
+          View Details
+        </Link>
+      </div>
+    </div>
+  </div>
+);
 
 export default Products;
