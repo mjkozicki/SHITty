@@ -4,8 +4,14 @@ import { CartContext } from '../contexts/CartContext';
 import { ShoppingCartIcon, HomeIcon, CubeIcon, ClockIcon } from '@heroicons/react/24/outline';
 
 const Navbar: React.FC = () => {
-  const { cart } = useContext(CartContext);
+  const cartContext = useContext(CartContext);
   const location = useLocation();
+  
+  if (!cartContext) {
+    return null; // or a loading state
+  }
+  
+  const { cart } = cartContext;
   
   const cartItemCount = cart.items.reduce((total, item) => total + item.quantity, 0);
   

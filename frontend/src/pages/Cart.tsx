@@ -4,7 +4,13 @@ import { TrashIcon, PlusIcon, MinusIcon, ShoppingBagIcon } from '@heroicons/reac
 import { CartContext } from '../contexts/CartContext';
 
 const Cart: React.FC = () => {
-  const { cart, updateQuantity, removeItem } = useContext(CartContext);
+  const cartContext = useContext(CartContext);
+  
+  if (!cartContext) {
+    return null; // or a loading state
+  }
+  
+  const { cart, updateQuantity, removeItem } = cartContext;
 
   const handleQuantityChange = (productId: string, newQuantity: number) => {
     if (newQuantity > 0) {

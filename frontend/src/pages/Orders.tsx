@@ -4,14 +4,14 @@ import { apiService, Order } from '../services/api';
 import { useCart } from '../contexts/CartContext';
 
 const Orders: React.FC = () => {
-  const { state } = useCart();
+  const { cart } = useCart();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadOrders = async () => {
       try {
-        const orderHistory = await apiService.getOrderHistory(state.userId);
+        const orderHistory = await apiService.getOrderHistory(cart.userId);
         setOrders(orderHistory);
       } catch (error) {
         console.error('Error loading orders:', error);
@@ -21,7 +21,7 @@ const Orders: React.FC = () => {
     };
 
     loadOrders();
-  }, [state.userId]);
+  }, [cart.userId]);
 
   if (loading) {
     return (

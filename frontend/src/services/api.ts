@@ -24,6 +24,14 @@ export interface Product {
 export interface CartItem {
   product_id: string;
   quantity: number;
+  product?: Product;
+}
+
+// Extended interface for cart items that always have product info
+export interface CartItemWithProduct {
+  product_id: string;
+  quantity: number;
+  product: Product;
 }
 
 export interface Cart {

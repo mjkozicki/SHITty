@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { StarIcon, FunnelIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+import { StarIcon } from '@heroicons/react/24/outline';
 import { apiService, Product } from '../services/api';
 
 const Products: React.FC = () => {

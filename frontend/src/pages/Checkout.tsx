@@ -5,17 +5,17 @@ import { useCart } from '../contexts/CartContext';
 import { apiService } from '../services/api';
 
 const Checkout: React.FC = () => {
-  const { state, clearCart } = useCart();
+  const { cart, clearCart } = useCart();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
 
   const handleCheckout = async () => {
-    if (state.items.length === 0) return;
+    if (cart.items.length === 0) return;
 
     setIsProcessing(true);
     try {
-      await apiService.checkout(state.userId);
+      await apiService.checkout(cart.userId);
       setOrderComplete(true);
       clearCart();
     } catch (error) {
@@ -48,7 +48,7 @@ const Checkout: React.FC = () => {
     );
   }
 
-  if (state.items.length === 0) {
+  if (cart.items.length === 0) {
     return (
       <div className="text-center py-12">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">Your cart is empty</h1>
@@ -72,7 +72,7 @@ const Checkout: React.FC = () => {
         <div className="space-y-4">
           <h2 className="text-xl font-bold text-gray-800">Order Summary</h2>
           <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
-            {state.items.map((item) => (
+            {cart.items.map((item) => (
               <div key={item.product_id} className="flex justify-between items-center">
                 <span className="text-gray-600">Item {item.product_id}</span>
                 <span className="font-medium">Qty: {item.quantity}</span>
@@ -81,7 +81,7 @@ const Checkout: React.FC = () => {
             <div className="border-t pt-4">
               <div className="flex justify-between text-lg font-bold">
                 <span>Total:</span>
-                <span className="text-primary-600">${state.total.toFixed(2)}</span>
+                <span className="text-primary-600">${cart.total.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -99,7 +99,7 @@ const Checkout: React.FC = () => {
               disabled={isProcessing}
               className="w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50"
             >
-              {isProcessing ? 'Processing...' : `Complete Order - $${state.total.toFixed(2)}`}
+              {isProcessing ? 'Processing...' : `Complete Order - $${cart.total.toFixed(2)}`}
             </button>
           </div>
         </div>
