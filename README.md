@@ -38,6 +38,7 @@ A comprehensive e-commerce API built in Go with product management, shopping car
 
 ### Prerequisites
 - Go 1.21 or higher
+- Node.js 16+ and npm (for React frontend)
 - Docker and Docker Compose (optional, for containerized deployment)
 
 ### Installation
@@ -77,12 +78,32 @@ make docker-stop
 docker-compose down
 ```
 
+### Frontend Development
+
+The React frontend is located in the `frontend/` directory:
+
+```bash
+# Navigate to frontend directory
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+
+# Build for production
+npm run build
+```
+
+The frontend will be available at `http://localhost:3000` and will automatically connect to the Go backend at `http://localhost:8080`.
+
 ### API Documentation
+
 
 Once the server is running, you can access the API documentation at:
 - **OpenAPI Specification**: `http://localhost:8080/openapi.json`
 - **Health Check**: `http://localhost:8080/health`
-
 
 
 ## Usage Examples
