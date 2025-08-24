@@ -17,8 +17,8 @@ RUN go get github.com/gin-gonic/gin && \
 # Build the application
 RUN go build -o main .
 
-# Expose port 8080
-EXPOSE 8080
+# Expose port 1009
+EXPOSE 1009
 
 # Run the application
 CMD ["./main"]

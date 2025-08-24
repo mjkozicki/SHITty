@@ -92,5 +92,5 @@ echo ""
 
 echo "✅ API testing completed!"
 echo ""
-echo "📚 API Documentation available at: http://localhost:8080/swagger/index.html"
-echo "🔗 OpenAPI JSON available at: http://localhost:8080/swagger/doc.json"
+echo "📚 API Documentation available at: http://localhost:1009/swagger/index.html"
+echo "🔗 OpenAPI JSON available at: http://localhost:1009/openapi.json"
